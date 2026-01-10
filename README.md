@@ -1,34 +1,22 @@
-# Data Science Portfolio 📊
+# Data Science Portfolio
 
-This repository serves as my personal portfolio and playground for various data science projects. Here, I document my learning progress by analyzing different datasets and applying new techniques.
+Welcome to my data science portfolio. This repository is where I store my personal projects and coding exercises. My goal is to improve my skills in exploratory data analysis, statistics, and machine learning by working with various real-world datasets.
 
-## 🎯 Goal
-The primary objective is the practical application and deepening of knowledge in:
-*   Exploratory Data Analysis (EDA)
-*   Statistical Methods
-*   Machine Learning Algorithms
-*   Data Visualization
-*   Feature Engineering
+## Current Projects
 
-## 📂 Current Projects
+### Abalone Analysis (PCA & Deep Learning)
+Located in the `Abalone` folder.
+This project combines dimensionality reduction with neural networks.
+*   **Principal Component Analysis (PCA):** Implemented PCA from scratch to rigorously understand the mathematics behind feature extraction and dimensionality reduction.
+*   **Deep Learning:** Trained a Multi-Layer Perceptron (MLPClassifier) on the PCA-transformed data to predict the gender of abalones.
+*   **Evaluation:** The project includes detailed steps on checking for overfitting, evaluating model accuracy, and analyzing the loss history during training.
 
-### 1. PCA Analysis (Abalone Dataset)
-*   **Location:** `/PCA`
-*   **Focus:** Deep understanding of Principal Component Analysis (PCA).
-*   **Content:**
-    *   Implementation of PCA "from scratch".
-    *   Analysis of the Abalone dataset for dimensionality reduction.
-    *   Comparison between `sklearn` implementation and manual calculation.
-    *   Visualization of principal components.
-
-### 2. Genome Analytics (IGSR Samples)
-*   **Location:** `/Genome_Project`
-*   **Focus:** Analysis and cleaning of real biological metadata.
-*   **Content:**
-    *   Processing of TSV (Tab-separated values) data.
-    *   Data cleaning and handling of missing values (Null-Values).
-    *   Analysis of sex and population distributions across different continents.
-    *   Creation of meaningful visualizations.
+### Genome Analytics (IGSR Samples)
+Located in the `Genome_Project` folder.
+This project focuses on cleaning and analyzing biological metadata from IGSR samples.
+*   **Data Cleaning:** Processed raw TSV data and handled missing values across complex biological attributes.
+*   **Exploratory Analysis:** Analyzed population distributions and demographics across different continents.
+*   **Visualization:** Created clear, informative visualizations to communicate findings effectively.
 
 ---
-*This repo is continuously expanded with new projects and analyses.*
+I plan to continue adding more projects to this repository as I learn new techniques and tools.
