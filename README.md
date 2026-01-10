@@ -1,34 +1,34 @@
 # Data Science Portfolio 📊
 
-Dieses Repository dient als mein persönliches Portfolio und Übungsplatz für verschiedene Data Science Projekte. Hier dokumentiere ich meinen Lernfortschritt, indem ich verschiedene Datensets analysiere und neue Techniken anwende.
+This repository serves as my personal portfolio and playground for various data science projects. Here, I document my learning progress by analyzing different datasets and applying new techniques.
 
-## 🎯 Ziel
-Das Hauptziel ist die praktische Anwendung und Vertiefung von Kenntnissen in:
-*   Explorativer Datenanalyse (EDA)
-*   Statistischen Methoden
-*   Machine Learning Algorithmen
-*   Datenvisualisierung
+## 🎯 Goal
+The primary objective is the practical application and deepening of knowledge in:
+*   Exploratory Data Analysis (EDA)
+*   Statistical Methods
+*   Machine Learning Algorithms
+*   Data Visualization
 *   Feature Engineering
 
-## 📂 Aktuelle Projekte
+## 📂 Current Projects
 
-### 1. PCA Analyse (Abalone Dataset)
-*   **Ort:** `/PCA`
-*   **Fokus:** Tiefes Verständnis der Hauptkomponentenanalyse (Principal Component Analysis).
-*   **Inhalt:**
-    *   Implementierung von PCA "from scratch".
-    *   Analyse des Abalone Datensatzes zur Reduktion der Dimensionen.
-    *   Vergleich von `sklearn` Implementierung und eigener Berechnung.
-    *   Visualisierung der Hauptkomponenten.
+### 1. PCA Analysis (Abalone Dataset)
+*   **Location:** `/PCA`
+*   **Focus:** Deep understanding of Principal Component Analysis (PCA).
+*   **Content:**
+    *   Implementation of PCA "from scratch".
+    *   Analysis of the Abalone dataset for dimensionality reduction.
+    *   Comparison between `sklearn` implementation and manual calculation.
+    *   Visualization of principal components.
 
-### 2. Genom Analytik (IGSR Samples)
-*   **Ort:** `/Genome_Project`
-*   **Fokus:** Analyse und Säuberung von realen biologischen Metadaten.
-*   **Inhalt:**
-    *   Verarbeitung von TSV-Daten (Tab-separated values).
-    *   Datenbereinigung und Umgang mit fehlenden Werten (Null-Values).
-    *   Analyse der Verteilung von Geschlechtern und Populationen auf verschiedenen Kontinenten.
-    *   Erstellung aussagekräftiger Visualisierungen.
+### 2. Genome Analytics (IGSR Samples)
+*   **Location:** `/Genome_Project`
+*   **Focus:** Analysis and cleaning of real biological metadata.
+*   **Content:**
+    *   Processing of TSV (Tab-separated values) data.
+    *   Data cleaning and handling of missing values (Null-Values).
+    *   Analysis of sex and population distributions across different continents.
+    *   Creation of meaningful visualizations.
 
 ---
-*Dieses Repo wird kontinuierlich mit neuen Projekten und Analysen erweitert.*
+*This repo is continuously expanded with new projects and analyses.*
