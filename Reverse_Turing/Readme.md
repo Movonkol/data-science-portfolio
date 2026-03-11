@@ -54,10 +54,7 @@ The temperature effect is the key diagnostic: locked models have such a strong l
 
 ### UMAP — Where Each Model Lives in Semantic Space
 
-![UMAP Clustering](outputs/plots/umap_clustering.html)
-*(Interactive — open in browser for hover details)*
-
-![UMAP Preview](data/figures/umap_preview.png)
+[**UMAP Clustering — Interactive**](outputs/plots/umap_clustering.html) *(open in browser for hover details)*
 
 The UMAP tells a story about **strategic diversity**, not just word choice.
 
