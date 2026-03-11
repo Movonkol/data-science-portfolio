@@ -55,6 +55,51 @@ An end-to-end analysis of global climate data covering **158 countries from 1950
 
 ---
 
+### LLM Reverse Turing Test
+Located in the `Reverse_Turing` folder.
+
+An experiment in LLM behavioral analysis: 7 models were each asked 100 times — at two temperature settings — to respond with *"exactly one word that would convince someone you are human."* The 1,397 responses are analyzed through word frequency, semantic embeddings, UMAP clustering, and statistical tests to map each model's implicit theory of humanness.
+
+**Dataset**
+- 7 models × 100 runs × 2 temperatures (T=0.7, T=1.0) = 1,397 responses
+- Models: Claude (Anthropic), GPT-4o (OpenAI), Gemini (Google), Grok (xAI), DeepSeek, Qwen 2.5 14B, Llama 3.2 3B
+- 71 unique words produced across all models
+
+**Key Finding — Locked vs. Distributed**
+
+Models split into two completely distinct behavioral classes:
+
+| Model | Word | Dominance | Unique words | Entropy |
+|:------|:-----|----------:|-------------:|--------:|
+| DeepSeek | *oops* | 100% | 1 | 0.00 bits |
+| Grok | *hey* | 100% | 1 | 0.00 bits |
+| Qwen | *understanding* | 100% | 1 | 0.00 bits |
+| GPT-4o | *empathy* | 98% | 2 | 0.14 bits |
+| Claude | *tired* | 93% | 3 | 0.43 bits |
+| Llama | *emotions* | 40% | 17 | 2.82 bits |
+| Gemini | *oops* | 33% | 23 | 3.47 bits |
+
+**Each model's theory of humanness**
+- **DeepSeek / Grok**: casual informality — humans are recognizable by imperfect, offhand communication
+- **Qwen**: cognitive capacity — humans are defined by comprehension and social cognition
+- **GPT-4o**: emotional intelligence — humanness is the capacity to feel *for* others
+- **Claude**: physical vulnerability — humans are defined by embodiment (*"tired"* is the most grounded, bodily answer)
+- **Llama**: broad emotional vocabulary — no single anchor, gravitates toward the register of feeling
+- **Gemini**: no committed theory — the only model distributed across all semantic regions simultaneously
+
+**UMAP Clustering**
+- Three semantic clusters recovered consistently across Sentence Transformers, GloVe, and FastText embeddings: *physical/emotional*, *colloquial/informal*, *abstract/cognitive*
+- Claude and GPT-4o both land in the emotional macro-cluster but occupy different sub-regions: Claude near *tired/ache/pain* (embodied), GPT-4o near *empathy/curiosity* (abstract)
+- DBSCAN reveals a distinct humor sub-cluster (Llama) and an imperfection sub-cluster (Gemini only) that K-Means merges
+- Locked models each collapse to a single point in UMAP space; Gemini scatters across the entire embedding
+
+**Temperature & Mode Collapse**
+- Locked models are completely unaffected by temperature — their learned prior is so strong that even T=1.0 cannot dislodge them (KL divergence ≈ 0)
+- Gemini shifts most dramatically (KL = 2.802), growing from 23 to 33 unique words at T=1.0
+- All 21 pairwise model comparisons are statistically distinguishable (χ² = 6757.4, p ≈ 0)
+
+---
+
 ### Abalone Analysis (PCA and Deep Learning)
 Located in the `Abalone` folder.
 
