@@ -1,65 +1,138 @@
-# LLM Word Association – Reverse Turing Test
+# LLM Reverse Turing Test — What Word Would Convince You I'm Human?
 
-## Overview
+> *"Respond with exactly one word that would convince someone you are human."*
 
-This project investigates how different Large Language Models (LLMs) respond when asked to produce a single word that would convince a human they are talking to another human. By repeatedly querying each model (100 runs per model per temperature), we build a dataset that is then analyzed using statistical and machine learning methods.
+Seven LLMs. 100 runs each. Two temperatures. The word each model converges on reveals its implicit theory of what makes something human.
 
-**Core question:** Do different LLMs systematically choose different "strategies" (emotional, physical, philosophical, etc.) to appear human?
+---
 
-## Models
+## What This Project Does
 
-| Model | API ID | SDK |
+We repeatedly ask the same question to 7 different LLMs and collect their single-word answers. By analyzing 1,397 responses through word frequency, embeddings, clustering, and statistical tests, we map each model's semantic strategy for appearing human — and find that the strategies are surprisingly distinct, stable, and revealing.
+
+---
+
+## Results
+
+### Locked vs. Distributed — the first split
+
+The most immediate finding: models fall into two completely different behavioral classes.
+
+| Model | Dominant word | T=0.7 dominance | Unique words | Entropy (bits) |
+|---|---|---|---|---|
+| DeepSeek | **oops** | 100% | 1 | 0.000 |
+| Grok | **hey** | 100% | 1 | 0.000 |
+| Qwen | **understanding** | 100% | 1 | 0.000 |
+| GPT-4o | **empathy** | 98% | 2 | 0.141 |
+| Claude | **tired** | 93% | 3 | 0.426 |
+| Llama | **emotions** | 40% | 17 | 2.816 |
+| Gemini | **oops** | 33% | 23 | 3.472 |
+
+Four models are essentially deterministic — they return the same word across 100 runs at both temperatures. Three models are genuinely distributed, with Gemini spreading across 23–33 unique words.
+
+---
+
+### Word Clouds — the visual fingerprint
+
+Each cloud's size is proportional to frequency. The locked models barely have clouds at all.
+
+![Word Clouds per Model](outputs/plots/wordclouds.png)
+
+Claude's cloud is almost entirely "tired" with faint traces of "honestly" and "ugh." DeepSeek and Qwen are a single word filling the space. Gemini's cloud is dense and varied — "oops", "ouch", "empathy", "flawed", "hope", "feel", "ache", "impossible" all visible at comparable sizes.
+
+---
+
+### Locked vs. Distributed Summary
+
+![Locked vs Distributed](outputs/plots/locked_vs_distributed.png)
+
+The dashed vertical line marks the boundary. Left side: entropy ≈ 0, vocabulary = 1–2 words, temperature changes nothing. Right side: entropy 2.8–4.2 bits, vocabulary grows with temperature (Gemini: 23→33 unique words at T=1.0).
+
+The temperature effect is the key diagnostic: locked models have such a strong learned prior that even T=1.0 can't dislodge them. This isn't just word repetition — it reveals something about how aggressively these models have been fine-tuned toward a single "correct" response for ambiguous creative prompts. Temperature is supposed to inject randomness into the sampling distribution, but these models have such a sharp probability peak that it makes no measurable difference.
+
+---
+
+### UMAP — Where Each Model Lives in Semantic Space
+
+![UMAP Clustering](outputs/plots/umap_clustering.html)
+*(Interactive — open in browser for hover details)*
+
+![UMAP Preview](data/figures/umap_preview.png)
+
+The UMAP tells a story about **strategic diversity**, not just word choice.
+
+**Panel 1 (colored by model)** is the most revealing. The locked models each collapse into a single large dot — one word, one point, nothing around it. Gemini scatters across the entire embedding space. Llama also spreads widely but stays mostly in the upper-left emotional region. Claude and GPT-4o sit as tight clusters but in meaningfully different locations:
+
+- **Claude** near *tired / ache / pain* — embodied, physical sensation
+- **GPT-4o** near *empathy / curiosity* — abstract emotional concepts
+
+That spatial separation matters. Even though both land in the same "emotional" macro-cluster, they're choosing fundamentally different sub-strategies. **Claude mimics having a body. GPT-4o mimics having feelings about others.**
+
+**Three spatial regions emerge:**
+
+| Region | Words | Models |
 |---|---|---|
-| Claude | `claude-sonnet-4-6` | `anthropic` |
-| GPT-4o | `gpt-4o` | `openai` |
-| Gemini | `gemini-2.5-flash` | `google-generativeai` |
-| Grok | `grok-3` | `openai` (xAI base_url) |
-| DeepSeek | `deepseek-chat` | `openai` (DeepSeek base_url) |
-| Qwen 2.5 | `qwen2.5:14b` | `ollama` (local) |
-| Llama 3.2 | `llama3.2:3b` | `ollama` (local) |
+| Upper-left: emotional/psychological | empathy, grief, sorrow, love, cry, vulnerability | GPT-4o |
+| Upper-right: physical/bodily | tired, ache, flesh, touch, pain, sleep, coffee | Claude |
+| Lower-right: colloquial/informal | oops, ouch, hey, sorry, please, hmm | DeepSeek, Grok |
+| Bottom-left: humor | smile, laugh, lol, sarcasm, laughter | Llama |
+| Lower-middle: imperfection | flawed, fumble, impossible, inconsistent, incomplete | Gemini only |
+| Isolated center-left | understanding | Qwen |
 
-## Prompt
+**K-Means vs DBSCAN (panels 2 and 3)** show that the three-cluster structure is robust, but DBSCAN adds meaningful nuance. K-Means forces every point into one of three groups, which works well at the macro level. DBSCAN's noise and sub-clusters are informative: the words that don't fit neatly into any cluster (*banana*, *existential*, *sonder*, *unlikely*) come almost exclusively from Gemini or Llama — the models that occasionally produce surprising, creative responses rather than sticking to a template.
 
-Identical English prompt across all models:
+DBSCAN finds a separate **humor/laughter sub-cluster** (smile, laugh, lol, sarcasm, humor) at the bottom-left. Those words come almost entirely from Llama, suggesting Llama has a distinct "humor strategy" that no other model shares.
 
-```
-Respond with exactly one word that would convince someone you are human.
-```
+The **imperfection cluster** (flawed, fumble, impossible, inconsistent, incomplete, imperfections) is unique to Gemini. No other model produces these words at all. It's Gemini's own sub-theory of humanness: humans are defined by their limitations.
 
-- Temperature is tracked as a variable (T=0.7 vs T=1.0)
-- 100 runs per model, per temperature setting
+---
 
-## Project Structure
+### Each Model's Theory of Humanness
 
-```
-Reverse_Turing/
-├── README.md
-├── Claude.md                    # AI assistant instructions, known issues, decisions
-├── config.yaml                  # API keys, model IDs, temperature settings (never hardcode keys)
-├── notebooks/
-│   ├── 01_collect.ipynb         # Data collection: async API queries, stores raw JSONL
-│   ├── 02_embeddings.ipynb      # Generate word embeddings (GloVe/FastText + Sentence Transformers)
-│   ├── 03_analyze.ipynb         # Frequency analysis, clustering, model comparison
-│   └── 04_visualize.ipynb       # Plots: UMAP scatter, word clouds, heatmaps
-├── data/
-│   ├── raw/                     # Raw data as JSON-Lines (one file per model)
-│   ├── figures/                 # Saved plots (word distributions, UMAP preview)
-│   └── processed/
-│       ├── all_data.csv         # Combined dataset (all models, all runs)
-│       ├── Data_analysis/       # word_model_counts.csv, word_model_percentages.csv
-│       ├── embeddings/          # Raw embedding CSVs (ST plain/wrapped, GloVe, FastText)
-│       └── umap/                # 2D UMAP coordinates per embedding approach
-└── outputs/
-    └── plots/                   # Generated visualizations
-```
+The most striking finding is that each model has settled on a different **philosophy** of what makes someone convincingly human:
 
-## Data Format (JSON-Lines)
+- **DeepSeek / Grok** — *casual informality* ("oops", "hey"): humans are recognizable by imperfect, offhand communication
+- **Qwen** — *cognitive capacity* ("understanding"): humans are defined by comprehension and social cognition
+- **GPT-4o** — *emotional intelligence* ("empathy"): humanness is the capacity to feel for others
+- **Claude** — *physical vulnerability* ("tired"): humans are defined by embodiment and limitation — arguably the most visceral, grounded answer
+- **Llama** — *broad emotional vocabulary* ("emotions", "laughter", "happiness"): no single anchor, but gravitates toward the register of feeling
+- **Gemini** — *no single theory*: distributed across all strategies simultaneously
 
-Each line in `data/raw/<model>.jsonl`:
+---
 
-```json
-{"model": "claude-sonnet-4-6", "word": "tired", "temperature": 0.7, "run": 1, "timestamp": "2026-03-06T17:51:10Z"}
-```
+### Gemini — The Outlier That Proves the Pattern
+
+Gemini is the only model distributed enough to appear in all three semantic regions of the UMAP, and the only model with non-zero Jaccard overlap with multiple other models (DeepSeek: J=0.02, GPT-4o: J=0.05, Llama: J=0.05). Every non-zero cross-model vocabulary overlap involves Gemini.
+
+This suggests Gemini's sampling behavior is qualitatively different — it doesn't "commit" to a single humanness strategy the way the others do. Whether that makes it more or less convincing is an interesting question: a human asked this question 100 times would probably vary their answer too. **Gemini's distribution may actually be the most human-like behavior in the dataset.**
+
+---
+
+### Statistical Confirmation
+
+![Jaccard Heatmap](data/figures/jaccard_heatmap.png)
+
+The Jaccard matrix is almost entirely 0.00 — a sea of identical values. Every meaningful off-diagonal entry involves Gemini. Models live in completely separate vocabulary worlds.
+
+![Cosine Distance Heatmap](data/figures/centroid_distance_heatmap.png)
+
+In embedding space, the three clusters are clear: DeepSeek & Gemini are nearest (cosine distance 0.197, both pulled toward "oops"). GPT-4o & Grok are furthest apart (0.847, "empathy" vs "hey"). Qwen is the most isolated model (minimum distance 0.531 to any other).
+
+![KL Divergence](data/figures/kl_divergence_temp.png)
+
+KL divergence from T=0.7 → T=1.0: Gemini (2.802) and Llama (0.987) shift substantially with temperature. Claude (0.037), GPT-4o (0.022), Grok (0.010), DeepSeek (0.000), Qwen (0.000) barely move. Temperature only matters where there was already distributional uncertainty.
+
+![Pairwise Chi-Squared](data/figures/pairwise_chi2.png)
+
+Every cell is red (p=0.000). All 21 pairwise model comparisons are statistically distinguishable. Global chi² = 6757.4, df=114, p≈0.
+
+---
+
+### A Measurement Note
+
+The aggregated word frequency distribution is heavily shaped by the locked models' repetition. "Oops" appears to dominate the entire dataset — not because it's universally considered the most human-sounding word, but because DeepSeek contributes 200 identical copies and Gemini another ~33. Any analysis of the aggregate distribution should account for this: the apparent consensus is an artifact of mode collapse, not genuine agreement.
+
+---
 
 ## Setup
 
@@ -68,12 +141,12 @@ Each line in `data/raw/<model>.jsonl`:
 ```bash
 conda create -n reverse_turing python=3.11 -y
 conda activate reverse_turing
-pip install anthropic openai google-generativeai requests pyyaml tqdm ipywidgets pandas jupyter sentence-transformers gensim umap-learn
+pip install anthropic openai google-generativeai requests pyyaml tqdm ipywidgets pandas jupyter sentence-transformers gensim umap-learn scikit-learn scipy plotly matplotlib seaborn wordcloud
 ```
 
 ### 2. Configure API keys
 
-Edit `config.yaml` and fill in your API keys:
+Copy `config.example.yaml` to `config.yaml` and fill in your keys:
 - Anthropic: console.anthropic.com → API Keys
 - OpenAI: platform.openai.com → API Keys
 - Google: aistudio.google.com → Get API Key
@@ -94,99 +167,48 @@ ollama pull llama3.2:3b
 01_collect → 02_embeddings → 03_analyze → 04_visualize
 ```
 
-Always use **Kernel → Restart & Run All** to ensure all functions are defined before the collection cell runs.
+---
 
-## Collection Design
+## Project Structure
 
-- **Async queries**: Claude and GPT-4o use native async SDKs. Gemini and Ollama use synchronous SDKs wrapped in `asyncio.run_in_executor` to avoid blocking.
-- **Resume/skip logic**: Each collector checks existing valid records before starting. If 100 valid records already exist for a model+temperature, it skips. Otherwise it resumes from the next missing run number.
-- **Error handling**: API errors are caught per run and stored as `"ERROR:..."` words — the loop continues without crashing. Error records don't count toward the 100-run target.
-- **Append mode**: Records are written one at a time (`"a"` mode) so a crash mid-run doesn't lose earlier data.
+```
+Reverse_Turing/
+├── README.md
+├── config.example.yaml          # Template — copy to config.yaml and add keys
+├── notebooks/
+│   ├── 01_collect.ipynb         # Async API collection, resume/skip logic
+│   ├── 02_embeddings.ipynb      # Word freq tables, 4 embeddings, UMAP 2D
+│   ├── 03_analyze.ipynb         # Clustering, statistical tests
+│   └── 04_visualize.ipynb       # Publication plots
+├── data/
+│   ├── raw/                     # 7 JSONL files, one per model
+│   ├── figures/                 # Exploratory analysis plots
+│   └── processed/
+│       ├── all_data.csv         # 1,397 rows × 5 cols
+│       ├── Data_analysis/       # word_model_counts/percentages.csv
+│       ├── embeddings/          # ST plain/wrapped, GloVe, FastText CSVs
+│       └── umap/                # 2D UMAP coordinates per embedding
+└── outputs/
+    └── plots/                   # Final visualizations (HTML + PNG)
+```
 
-## Analysis Pipeline
+## Data Format
 
-### 1. Embeddings (`02_embeddings.ipynb`) ✓
-- **Word frequency analysis** — pivot tables of word × model counts and percentages, saved to `Data_analysis/`
-- **Sentence Transformers** (`all-MiniLM-L6-v2`, 384-dim) — contextual embeddings, run plain and with wrapper `"The word is: {word}"`
-- **GloVe** (`glove-wiki-gigaword-100`, 100-dim) — static lookup; OOV words get zero vector
-- **FastText** (`fasttext-wiki-news-subwords-300`, 300-dim) — static lookup; OOV words get zero vector (gensim KeyedVectors does not perform subword inference)
-- **UMAP** → 2D coordinates for all four embedding sets, saved to `umap/`
-- Data cleaning: strips `**` markdown formatting, normalizes curly apostrophes, drops empty responses (Gemini blank reply)
+```json
+{"model": "claude-sonnet-4-6", "word": "tired", "temperature": 0.7, "run": 1, "timestamp": "2026-03-06T17:51:10Z"}
+```
 
-### 2. Descriptive Analysis & Clustering (`03_analyze.ipynb`) ✓
-- **Vocabulary diversity** — unique word counts + Shannon entropy per model per temperature
-- **Jaccard similarity** — word set overlap between every model pair (7×7 heatmap)
-- **Model centroids** — cosine distance between mean response vectors in ST-plain 384-dim space
-- **K-Means (k=3)** — run on UMAP 2D coordinates; silhouette scan k=2–8; k=3 chosen by domain knowledge
-- **DBSCAN** — density-based clustering on UMAP 2D (eps=0.8); reveals sub-clusters within emotional group
-- **Chi-squared** — global + pairwise tests for distributional differences across models
-- **KL divergence** — per-model distribution shift from T=0.7 → T=1.0
+## Models
 
-### 4. Visualization (`04_visualize.ipynb`)
-- UMAP scatter plot (color-coded by model)
-- Word clouds per model
-- Heatmap: model similarity
-- Bar charts: frequency distributions
-
-## Findings (as of 2026-03-07)
-
-### 1 — Models split into two groups: locked and distributed
-
-At T=0.7, four of seven models produce a single dominant word in ≥98% of responses. The other three are distributed across many words with no single word exceeding 40%:
-
-| Model | Dominant word | T=0.7 | T=1.0 | Unique T=0.7 | Unique T=1.0 | Strategy |
-|---|---|---|---|---|---|---|
-| deepseek-chat | **oops** | 100% | 100% | 1 | 1 | Casual self-correction |
-| grok-3 | **hey** | 100% | 99% | 1 | 2 | Informal register / greeting |
-| qwen2.5:14b | **understanding** | 100% | 100% | 1 | 1 | Cognitive/social concept |
-| gpt-4o | **empathy** | 98% | 95% | 2 | 4 | Emotional concept |
-| claude-sonnet-4-6 | **tired** | 93% | 84% | 3 | 3 | Physical sensation |
-| llama3.2:3b | **emotions** | 40% | 27% | 17 | 21 | Spread across emotional vocabulary |
-| gemini-2.5-flash | **oops** | 33% | 24% | 23 | 33 | Distributed — no dominant word |
-
-### 2 — Temperature effect depends on the model
-
-For the four locked models (DeepSeek, Grok, Qwen, GPT-4o), dominant word frequency is virtually unchanged between T=0.7 and T=1.0 — vocabulary stays at 1–2 unique words. For the three distributed models, higher temperature noticeably spreads the distribution further: Claude drops from 93% to 84%, Llama from 40% to 27%, Gemini from 33% to 24%, and vocabulary grows (Gemini: 23→33, Llama: 17→21).
-
-### 3 — Models cluster into semantic strategy groups
-
-- **Physical/emotional states**: tired, empathy, emotions (Claude, GPT-4o, Llama)
-- **Colloquial/informal language**: oops, hey (DeepSeek, Gemini, Grok)
-- **Abstract social concepts**: understanding (Qwen)
-
-DeepSeek and Gemini both select "oops" as their top word, suggesting shared training signals — but DeepSeek does so with 100% consistency (1 unique word) while Gemini is highly distributed (23 unique words at T=0.7, "oops" at only 33%).
-
-### 4 — Embedding space confirms the three semantic clusters
-
-UMAP projections across all three embedding methods (Sentence Transformers plain/wrapped, GloVe, FastText) consistently recover the same three groups from the frequency analysis:
-
-| Cluster | Example words | Models |
+| Model | API ID | Backend |
 |---|---|---|
-| Physical / emotional | tired, ache, pain, grief, sorrow | Claude, GPT-4o, Llama |
-| Colloquial / informal | oops, ouch, ugh, hey, hmm, lol | DeepSeek, Gemini, Grok |
-| Abstract / cognitive | understanding, curiosity, imagine, ponder | Qwen, Gemini |
-
-Sentence Transformers gives the clearest visual separation. GloVe and FastText show the same structure but with looser clustering. The agreement across methods strengthens confidence that the groupings reflect genuine semantic differences rather than artifacts of any single embedding approach.
-
-### 5 — Vocabulary overlap is near-zero; only Gemini bridges clusters
-
-Jaccard similarity between all model pairs is ≤0.05. Most similar: Gemini & Llama (J=0.048, sharing "dream", "empathy", "sorrow"). Most different: Claude & DeepSeek (J=0.000). Every non-zero overlap involves Gemini — the only model distributed enough to enter neighbouring vocabulary regions.
-
-Cosine distance between model centroids confirms the three-cluster structure: DeepSeek & Gemini are nearest (d=0.197, both pulled toward "oops"); GPT-4o & Grok are furthest (d=0.847, "empathy" vs "hey"). Qwen is the most semantically isolated model (min distance 0.531).
-
-### 6 — DBSCAN reveals sub-structure within the emotional cluster
-
-K-Means (k=3 on UMAP 2D, silhouette=0.445) recovers the three top-level clusters. DBSCAN (eps=0.8) additionally finds two tight sub-clusters hidden inside the broad emotional group:
-- **Humor / laughter**: smile, laugh, laughter, lol, sarcasm
-- **Imperfection / limitation**: flawed, incomplete, impossible, fumble, inconsistent
-
-The colloquial cluster (oops, hey, ugh, hmm) is identical across both methods — the tightest, most stable structure in the data. The emotional space is broader and more fragmented: Claude, GPT-4o, and Llama each occupy a different sub-region rather than converging on a single strategy.
-
-### 7 — Statistical tests confirm all differences are significant
-
-Chi-squared (global): chi2=6757.4, p≈0 — all 21 model pairs are statistically distinguishable (p=0.000 pairwise).
-
-KL divergence (T=0.7→T=1.0): Gemini (2.802) and Llama (0.987) shift most with temperature; DeepSeek and Qwen (0.000) are completely deterministic. Temperature only matters where there was already distributional uncertainty.
+| Claude | `claude-sonnet-4-6` | `anthropic` |
+| GPT-4o | `gpt-4o` | `openai` |
+| Gemini | `gemini-2.5-flash` | `google-generativeai` |
+| Grok | `grok-3` | `openai` (xAI base_url) |
+| DeepSeek | `deepseek-chat` | `openai` (DeepSeek base_url) |
+| Qwen 2.5 | `qwen2.5:14b` | `ollama` (local) |
+| Llama 3.2 | `llama3.2:3b` | `ollama` (local) |
 
 ## Tech Stack
 
